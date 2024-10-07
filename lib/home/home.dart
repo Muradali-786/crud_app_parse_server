@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 
-
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -23,27 +22,15 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    void doUserRegistration() async {
-      final username  = 'itsmurad07@gmail.com';
-      final password = '1234567';
-
-      final user = ParseUser.createUser(username, password,username);
-
-      var response = await user.signUp();
-
-      if (response.success) {
-        showSuccess(context);
-      } else {
-        showError(context, response.error!.message);
-      }
-    }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Parse Server'),
+        title: const Text('Back 4 App'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: FutureBuilder<List<ParseObject>>(
-        future: fetchDataFromTodo(), // Call the fetch method
+        future: fetchDataFromTodo(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -60,34 +47,38 @@ class _HomeState extends State<Home> {
             itemCount: todos.length,
             itemBuilder: (context, index) {
               final todo = todos[index];
-              return ListTile(
-                title: Text(todo.get<String>('title') ?? 'No Title'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        await _updateTodoTitle(context, todo, onUpdate: () {
-                          setState(() {});
-                        });
-                      },
-                      child: const Icon(
-                        Icons.edit,
+              return Card(
+                elevation: 3,
+                color: Colors.white70,
+                child: ListTile(
+                  title: Text(todo.get<String>('title') ?? 'No Title'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          await _updateTodoTitle(context, todo, onUpdate: () {
+                            setState(() {});
+                          });
+                        },
+                        child: const Icon(
+                          Icons.edit,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 7),
-                    GestureDetector(
-                      onTap: () async {
-                        deleteTodo(todo.objectId.toString()).then((e) {
-                          setState(() {});
-                        });
-                        // Handle deletion if needed
-                      },
-                      child: const Icon(
-                        Icons.delete,
+                      const SizedBox(width: 7),
+                      GestureDetector(
+                        onTap: () async {
+                          deleteTodo(todo.objectId.toString()).then((e) {
+                            setState(() {});
+                          });
+
+                        },
+                        child: const Icon(
+                          Icons.delete,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },
@@ -96,7 +87,7 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          doUserRegistration();
+
           saveTodo('A Dummy task to do').then((_) {
             setState(() {});
           });
@@ -165,42 +156,3 @@ Future<void> deleteTodo(String id) async {
   await todo.delete();
 }
 
-void showSuccess(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text("Success!"),
-        content: const Text("User was successfully created!"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("OK"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
-void showError(BuildContext context, String errorMessage) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text("Error!"),
-        content: Text(errorMessage),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("OK"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
